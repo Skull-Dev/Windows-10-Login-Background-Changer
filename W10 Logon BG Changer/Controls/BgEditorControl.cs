@@ -72,8 +72,11 @@ namespace W10_Logon_BG_Changer.Controls
                 Multiselect = false
             };
 
-            if (!string.IsNullOrEmpty(Settings.Default.Get("last_folder", string.Empty)))
-                ofd.InitialDirectory = Settings.Default.Get("last_folder", string.Empty);
+            var initialDirectory = Settings.Default.Get("last_folder", string.Empty);
+                if (!string.IsNullOrEmpty(initialDirectory))
+                    if (Directory.Exists(initialDirectory)) {
+                        ofd.InitialDirectory = initialDirectory;
+                    }
 
             var dialog = ofd.ShowDialog();
             if (dialog != true) return;
@@ -164,7 +167,7 @@ namespace W10_Logon_BG_Changer.Controls
             Settings.Default.Set("filename", Path.GetFileName(_mainWindow.SelectedFile));
             Settings.Default.Save();
             _runningApplySettings = true;
-            var holderContent = ((Button)sender);
+            var holderContent = ((Button) sender);
             var progress = new ProgressRing
             {
                 IsActive = true,
@@ -183,6 +186,11 @@ namespace W10_Logon_BG_Changer.Controls
                 {
                     holderContent.Content = def;
                     _runningApplySettings = false;
+
+                    WpfMessageBox.Show(
+                        LanguageLibrary.Language.Default.success_apply_msg,
+                        LanguageLibrary.Language.Default.title_success
+                        );
                 });
             });
         }
